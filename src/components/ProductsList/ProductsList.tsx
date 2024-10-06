@@ -32,7 +32,9 @@ export function ProductsList() {
         >
           {message}
         </div>
-      ) : null}
+      ) : (
+        <div className="message"></div>
+      )}
       <h1>Available products</h1>
       {products.length > 0 ? (
         <ul className="list_ul-products">

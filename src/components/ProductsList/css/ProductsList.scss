@@ -13,7 +13,6 @@ li {
 
 .list_products {
   margin: 25px;
-  // min-height: 85vh;
 }
 
 .message {
@@ -21,6 +20,7 @@ li {
   padding: 10px;
   border-radius: 5px;
   margin-top: 10px;
+  min-height: 4vh;
 }
 
 .message_success {

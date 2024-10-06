@@ -27,6 +27,7 @@ const Product = ({ product }: { product: ProductType }) => {
   const account = useAtomValue(accountAtom);
 
   const handlePay = async () => {
+    setMessage(null)
     if (count <= 0) {
       alert("Select the correct number of products");
       return;
