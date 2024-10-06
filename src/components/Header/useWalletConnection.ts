@@ -5,16 +5,8 @@ import { setTransactionResult } from "../Product/Product";
 
 export const accountAtom = atom<string | null>(null);
 
-export const setAccountAtom = atom(
-  null,
-  (get, set, newAccount: string | null) => {
-    set(accountAtom, newAccount);
-  }
-);
-
 const useWalletConnection = () => {
-    const [account] = useAtom(accountAtom);
-    const [, setAccount] = useAtom(setAccountAtom);
+    const [account, setAccount] = useAtom(accountAtom);
     const [, setResult] = useAtom(setTransactionResult)
 
     useEffect(() => {
