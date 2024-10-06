@@ -35,6 +35,10 @@ const Product = ({ product }: { product: ProductType }) => {
       alert("Connect your wallet first!");
       return;
     }
+    if (transactionLoading) {
+      alert("Transaction is already in progress!");
+      return;
+    }
     try {
       setTransactinhLoad(true);
       const totalPrice = product.priceInETH * count;
