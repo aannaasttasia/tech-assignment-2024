@@ -1,0 +1,53 @@
+@import url("https://fonts.googleapis.com/css2?family=Comfortaa:wght@700&display=swap");
+
+header {
+  display: flex;
+  background: #c7c7c7;
+  padding: 0;
+  z-index: 100;
+  width: 100%;
+}
+
+.header_logo {
+  padding: 10px 20px;
+  font-family: "Comfortaa";
+  font-weight: 700;
+  align-content: center;
+}
+
+.header_title {
+  padding: 10px 20px;
+  font-family: "Comfortaa";
+  font-weight: 700;
+  align-content: center;
+}
+
+.header_shop {
+  color: rgb(37, 85, 190);
+}
+
+.header_account {
+  margin-left: auto;
+  display: flex;
+}
+
+.header_wallet {
+  background-color: #0e5ae7d0;
+  border-radius: 8px;
+  border-width: 0;
+  color: #fffcf2;
+  cursor: pointer;
+  display: inline-block;
+  font-size: 14px;
+  font-weight: 500;
+  list-style: none;
+  margin: 4px;
+  padding: 5px 6px;
+  align-content: center;
+}
+
+@media (max-width: 350px) {
+  .header_logo {
+    display: none;
+  }
+}

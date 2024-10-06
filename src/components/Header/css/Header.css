@@ -1,0 +1,118 @@
+@import url("https://fonts.googleapis.com/css2?family=Comfortaa:wght@700&display=swap");
+.header {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  background: #c7c7c7;
+  padding: 0;
+  z-index: 100;
+  width: 100%;
+}
+
+.header__logo {
+  padding: 10px 20px;
+  font-family: 'Comfortaa';
+  font-weight: 700;
+  -ms-flex-line-pack: center;
+      align-content: center;
+}
+
+.header__title {
+  padding: 10px 20px;
+  font-family: 'Comfortaa';
+  font-weight: 700;
+  -ms-flex-line-pack: center;
+      align-content: center;
+}
+
+.header__shopping {
+  color: #2555be;
+}
+
+.header__accountIcon {
+  padding: 10px 20px;
+  font-family: 'Comfortaa';
+  font-weight: 700;
+  -ms-flex-line-pack: center;
+      align-content: center;
+  cursor: pointer;
+  border-radius: 50%;
+}
+
+.header__accountInfo {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  -webkit-transform: translate(-50%, -50%);
+          transform: translate(-50%, -50%);
+  z-index: 500;
+  height: 50%;
+  width: 40%;
+  background-color: #eeeeee;
+  overflow: scroll;
+  padding: 10%;
+  -webkit-box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+          box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+  border-radius: 2%;
+}
+
+.header__container {
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+  left: 0;
+  z-index: 101;
+}
+
+.header_account {
+  margin-left: auto;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.header__logIn {
+  padding: 5px 10px;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  -ms-flex-item-align: center;
+      -ms-grid-row-align: center;
+      align-self: center;
+  background-color: #a5a5a5;
+  border-radius: 0.5rem;
+  -webkit-transition: background-color 0.3s ease;
+  transition: background-color 0.3s ease;
+  font-family: 'Comfortaa';
+  font-weight: 700;
+}
+
+.light-mode .fa-user {
+  color: #2b2b2ba7;
+}
+
+.header_wallet_connected, .header_wallet_is-not-connected {
+  -ms-flex-line-pack: center;
+      align-content: center;
+  padding: 10px;
+  font-family: 'Comfortaa';
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.header_wallet_connected {
+  color: #2555be;
+}
+
+@media (max-width: 950px) {
+  .header__logo {
+    display: none;
+  }
+}
+
+@media (max-width: 350px) {
+  .header__logo {
+    display: none;
+  }
+}
+/*# sourceMappingURL=Header.css.map */

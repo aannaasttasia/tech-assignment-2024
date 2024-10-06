@@ -1,0 +1,141 @@
+{
+    "abi": [
+        {
+            "type": "constructor",
+            "inputs": [
+                {
+                    "name": "_treasury",
+                    "type": "address",
+                    "internalType": "address"
+                }
+            ],
+            "stateMutability": "nonpayable"
+        },
+        {
+            "type": "function",
+            "name": "addProduct",
+            "inputs": [
+                {
+                    "name": "id",
+                    "type": "uint256",
+                    "internalType": "uint256"
+                },
+                {
+                    "name": "product",
+                    "type": "tuple",
+                    "internalType": "struct Market.Product",
+                    "components": [
+                        {
+                            "name": "name",
+                            "type": "string",
+                            "internalType": "string"
+                        },
+                        {
+                            "name": "linkToImage",
+                            "type": "string",
+                            "internalType": "string"
+                        },
+                        {
+                            "name": "priceInETH",
+                            "type": "uint256",
+                            "internalType": "uint256"
+                        }
+                    ]
+                }
+            ],
+            "outputs": [],
+            "stateMutability": "nonpayable"
+        },
+        {
+            "type": "function",
+            "name": "productById",
+            "inputs": [
+                {
+                    "name": "productId",
+                    "type": "uint256",
+                    "internalType": "uint256"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "name",
+                    "type": "string",
+                    "internalType": "string"
+                },
+                {
+                    "name": "linkToImage",
+                    "type": "string",
+                    "internalType": "string"
+                },
+                {
+                    "name": "priceInETH",
+                    "type": "uint256",
+                    "internalType": "uint256"
+                }
+            ],
+            "stateMutability": "view"
+        },
+        {
+            "type": "function",
+            "name": "productOf",
+            "inputs": [
+                {
+                    "name": "account",
+                    "type": "address",
+                    "internalType": "address"
+                },
+                {
+                    "name": "productId",
+                    "type": "uint256",
+                    "internalType": "uint256"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "",
+                    "type": "uint256",
+                    "internalType": "uint256"
+                }
+            ],
+            "stateMutability": "view"
+        },
+        {
+            "type": "function",
+            "name": "purchase",
+            "inputs": [
+                {
+                    "name": "id",
+                    "type": "uint256",
+                    "internalType": "uint256"
+                },
+                {
+                    "name": "count",
+                    "type": "uint256",
+                    "internalType": "uint256"
+                }
+            ],
+            "outputs": [],
+            "stateMutability": "payable"
+        },
+        {
+            "type": "error",
+            "name": "InsufficientAmount",
+            "inputs": []
+        },
+        {
+            "type": "error",
+            "name": "NotDefinedTrasury",
+            "inputs": []
+        },
+        {
+            "type": "error",
+            "name": "ProductNotExist",
+            "inputs": []
+        },
+        {
+            "type": "error",
+            "name": "TransferFailed",
+            "inputs": []
+        }
+    ]
+}

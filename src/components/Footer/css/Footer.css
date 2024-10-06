@@ -1,0 +1,67 @@
+@import url("https://fonts.googleapis.com/css2?family=Comfortaa:wght@700&display=swap");
+.about-me {
+  font-family: 'Comfortaa';
+}
+
+.footer {
+  background: #93939335;
+  padding: 10px 0px;
+  position: absolute;
+  width: 100%;
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  z-index: 1000;
+}
+
+.modal {
+  background-color: #fff;
+  padding: 10%;
+  border-radius: 8px;
+  -webkit-box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+          box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  z-index: 1010;
+  max-width: 90%;
+  max-height: 90%;
+  overflow: auto;
+}
+
+.footer__support {
+  background-color: #a5a5a5;
+  color: #fff;
+  border: none;
+  padding: 0.4rem 1rem;
+  font-size: 1rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  -webkit-transition: background-color 0.3s ease;
+  transition: background-color 0.3s ease;
+  margin: 1%;
+}
+
+.footer__support:hover {
+  background-color: #727272;
+}
+
+@media screen and (max-width: 950px) {
+  .footer__support {
+    padding: .5% 2%;
+    font-size: .6rem;
+  }
+}
+/*# sourceMappingURL=Footer.css.map */
