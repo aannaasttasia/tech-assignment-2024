@@ -40,6 +40,7 @@ const Product = ({ product }: { product: ProductType }) => {
       alert("Transaction is already in progress!");
       return;
     }
+    // add check that user has enough balance to do purchase (best practise also estimates transaction fee)
     try {
       setTransactinhLoad(true);
       const totalPrice = product.priceInETH * count;
@@ -57,10 +58,15 @@ const Product = ({ product }: { product: ProductType }) => {
       const msg = `Transaction failed: ${firstLine}`;
       setMessage(msg);
     } finally {
+      // pls each times after async actions check component on unmount (like for products info)
       setTransactinhLoad(false);
     }
   };
+  // on change account better reset counter to 0
 
+  // better use inner callback and add memoization,
+  // memoization improve performance, inner function guarantees that increment the correct value
+  // const handleIncrement = useCallback(() => setCount((prev) => prev + 1n), [])
   const handleIncrement = () => {
     setCount(count + 1n);
   };

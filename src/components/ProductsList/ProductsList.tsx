@@ -13,12 +13,17 @@ export function ProductsList() {
   const message = useAtomValue(transactionResultAtom);
 
   useEffect(() => {
+    // let isActual = true
     const getProducts = async () => {
       const productsData = await fetchProducts();
+      // u potentially can load data after components unmount
+      // need to add check that u set actual data
+      // if (!isActual) return
       setProducts(productsData);
     };
     getProducts();
-  }, [account]);
+    // return () => (isActual = false)
+  }, [account]); // general products info doesn't depend on account
 
   return (
     <section className="list_products">

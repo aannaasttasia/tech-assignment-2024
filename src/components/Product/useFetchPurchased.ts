@@ -18,18 +18,23 @@ export const useFetchPurchased = (id: bigint) => {
             } catch (error) {
                 console.error("Failed to fetch purchased products:", error);
             } finally {
+                // check actuality after each async action
                 setLoading(false);
             }
         } else {
-          setPurchasedData(null);
-          setLoading(false);
+            // check actuality after each async action
+            setPurchasedData(null);
+            setLoading(false);
         }
     };
-  
+
+    // `message` not best candidate for update state, state update only after transaction success and confirmed,
+    // but message changed on reject tx by user, and creating tx (just creating, but not confirmed)
+    // also if u buy product1 u need update only product1, but message relates for all products
     useEffect(() => {
-      setLoading(true); 
+      setLoading(true); // `setLoading(true)` better call inside `getPurchasedProducts`
       getPurchasedProducts();
     }, [account, id, message]);
-  
+
     return { purchasedData, loading };
 };
