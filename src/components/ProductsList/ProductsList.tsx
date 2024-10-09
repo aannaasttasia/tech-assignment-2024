@@ -5,32 +5,35 @@ import "./css/ProductsList.scss";
 import Loader from "../Loader/Loader";
 import { fetchProducts } from "../../services/productService";
 import { useAtomValue } from "jotai";
-import { accountAtom } from "../Header/useWalletConnection";
 
 export function ProductsList() {
   const [products, setProducts] = useState<ProductType[]>([]);
-  const account = useAtomValue(accountAtom);
-  const message = useAtomValue(transactionResultAtom);
+  const result = useAtomValue(transactionResultAtom);
 
   useEffect(() => {
+    let isActual = true;
     const getProducts = async () => {
       const productsData = await fetchProducts();
+      if (!isActual) return;
       setProducts(productsData);
     };
     getProducts();
-  }, [account]);
+    return () => {
+      isActual = false;
+    };
+  }, []);
 
   return (
     <section className="list_products">
-      {message ? (
+      {result ? (
         <div
           className={`message ${
-            message.startsWith("Transaction failed")
+            result.message.startsWith("Transaction failed")
               ? "message_error"
               : "message_success"
           }`}
         >
-          {message}
+          {result.message}
         </div>
       ) : (
         <div className="message"></div>

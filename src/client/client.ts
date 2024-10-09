@@ -8,5 +8,5 @@ export const walletClient = createWalletClient({
 
 export const publicClient = createPublicClient({
     chain: sepolia,
-    transport: http()
+    transport: http(),
 })
