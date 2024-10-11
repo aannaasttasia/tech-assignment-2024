@@ -1,47 +1,96 @@
 import "./css/Product.scss";
 import { ProductType } from "../../types/productType";
-import {
-  estimateFee,
-  purchase,
-  purchasedProducts,
-} from "../../services/productService";
+import { contractAddress } from "../../contract";
 import { useCallback, useEffect, useState } from "react";
-import { atom, useAtom } from "jotai";
 import useWalletConnection from "../Header/useWalletConnection";
-import { useFetchPurchased } from "./useFetchPurchased";
+import {
+  useEstimateFeesPerGas,
+  useEstimateGas,
+  useReadContract,
+  useWaitForTransactionReceipt,
+  useWriteContract,
+} from "wagmi";
+import contractABI from "../../contractABI.json";
 
 const weiToEth = (priceInWei: bigint) => {
   return Number(priceInWei) / 10 ** 18;
 };
 
-export const transactionResultAtom = atom<{
-  status: string | null;
-  message: string;
-} | null>(null);
+export const usePurchasedCount = (
+  account: `0x${string}` | undefined,
+  id: bigint
+) => {
+  return useReadContract({
+    address: contractAddress,
+    abi: contractABI.abi,
+    functionName: "productOf",
+    args: [account, id],
+  });
+};
 
-export const setTransactionResult = atom(
-  null,
-  (get, set, result: { status: string | null; message: string } | null) => {
-    set(transactionResultAtom, result);
-  }
-);
-
-const Product = ({ product }: { product: ProductType }) => {
+const Product = ({
+  product,
+  onTransactionResult,
+}: {
+  product: ProductType;
+  onTransactionResult: (message: string | null) => void;
+}) => {
   const [count, setCount] = useState<bigint>(0n);
-  const [, setResult] = useAtom(setTransactionResult);
-  const [transactionLoading, setTransactinhLoad] = useState<boolean>(false);
-  const { purchasedData, loading, setPurchasedData } = useFetchPurchased(
-    BigInt(product.id)
-  );
   const { account, balanceData } = useWalletConnection();
+  const {
+    data: hash,
+    writeContract,
+    isPending: isWriteContractPending,
+    isError: isWriteContractError,
+    error: writeContractError,
+  } = useWriteContract();
+
+  const { data: gas, isLoading: gasLoading } = useEstimateGas();
+
+  const { data: feePerGas, isLoading: feePerGasLoading } =
+    useEstimateFeesPerGas();
+
+  const {
+    data: purchasedResult,
+    isLoading: isPurchasedDataLoading,
+    refetch: refetchPurchasedData,
+  } = usePurchasedCount(account, product.id);
+  
+  const {
+    isLoading: isTransactionReceiptLoading,
+    isSuccess: isTransactionReceiptSuccess,
+    isError: isTransactionReceiptError,
+  } = useWaitForTransactionReceipt({
+    hash,
+  });
+
+  useEffect(() => {
+    if (isTransactionReceiptSuccess) {
+      onTransactionResult("Transaction successful! Hash: " + hash);
+    } else if (isTransactionReceiptError) {
+      onTransactionResult("Transaction failed. Please try again.");
+    } else if (isWriteContractError) {
+      const contractWritingError = writeContractError.toString();
+      onTransactionResult(contractWritingError.split("\n")[0]);
+    }
+  }, [isTransactionReceiptSuccess, isTransactionReceiptError, hash, isWriteContractError, writeContractError]);
 
   useEffect(() => {
     setCount(0n);
-  }, [account]);
+  }, [account, isTransactionReceiptSuccess, isTransactionReceiptError]);
 
-  const handlePay = async () => {
-    setResult(null);
+  useEffect(()=>{
+    onTransactionResult(null)
+  },[account])
+
+  useEffect(() => {
+    refetchPurchasedData();
+  }, [isTransactionReceiptLoading]);
+
+  const handlePay = () => {
+    onTransactionResult(null);
     const totalPrice = product.priceInETH * count;
+    let fee = 0n;
     if (count <= 0) {
       alert("Select the correct number of products");
       return;
@@ -50,54 +99,36 @@ const Product = ({ product }: { product: ProductType }) => {
       alert("Connect your wallet first!");
       return;
     }
-    if (transactionLoading) {
+    if (isWriteContractPending || isTransactionReceiptLoading) {
       alert("Transaction is already in progress!");
       return;
     }
-    let isActual = true;
-    try {
-      setTransactinhLoad(true);
-      const fee = await estimateFee(
-        totalPrice,
-        BigInt(product.id),
-        count,
-        account
-      );
-      if (balanceData && totalPrice > balanceData?.value + BigInt(fee)) {
-        alert("You do not have enough SepoliaETH in your account to pay for transaction fees on Sepolia network");
-        return;
-      }
-      const hash = await purchase(
-        totalPrice,
-        BigInt(product.id),
-        count,
-        account
-      );
-      if (!isActual) return;
-      console.log(hash);
-      setResult({ status: hash.status, message: hash.message });
-
-      if (hash.status === "success") {
-        const productsCount = await purchasedProducts(
-          account,
-          BigInt(product.id)
-        );
-        setPurchasedData(Number(productsCount.purchasedItemsCount));
-      }
-    } catch (error) {
-      const errorMessage = (error as any).message.toString();
-      const firstLine = errorMessage.split("\n")[0];
-      const msg = `Transaction failed: ${firstLine}`;
-      if (!isActual) return;
-      setResult({ status: "reverted", message: msg });
-    } finally {
-      if (!isActual) return;
-      setTransactinhLoad(false);
+    if (gasLoading || feePerGasLoading || !feePerGas || !gas) {
+      alert("Estimating fees, please wait and try again..");
+      return;
+    } else {
+      fee = gas * (feePerGas?.maxFeePerGas + feePerGas?.maxPriorityFeePerGas);
+      console.log(Number(fee) / 10 ** 18);
     }
-
-    return () => {
-      isActual = false;
-    };
+    if (balanceData && totalPrice > balanceData?.value + fee) {
+      onTransactionResult(
+        "You do not have enough SepoliaETH in your account to pay for transaction fees on Sepolia network"
+      );
+      return;
+    }
+    try {
+      writeContract({
+        address: contractAddress,
+        abi: contractABI.abi,
+        functionName: "purchase",
+        args: [product.id, count],
+        account: account as `0x${string}`,
+        value: totalPrice,
+      });
+    } catch (error) {
+      onTransactionResult("Transaction failed. Please try again.");
+      console.error(error);
+    }
   };
 
   const handleIncrement = useCallback(() => setCount((prev) => prev + 1n), []);
@@ -119,26 +150,31 @@ const Product = ({ product }: { product: ProductType }) => {
           <button
             className="product_btn"
             onClick={handleDecrement}
-            disabled={count <= 0}
+            disabled={count <= 0 || isWriteContractPending || isTransactionReceiptLoading}
           >
             -
           </button>
           <div className="product_count">{count.toString()}</div>
-          <button className="product_btn" onClick={handleIncrement}>
+          <button
+            className="product_btn"
+            onClick={handleIncrement}
+            disabled={isWriteContractPending || isTransactionReceiptLoading}
+          >
             +
           </button>
         </div>
         <div className="product_buy-btn-container" onClick={handlePay}>
           <span className="product_buy">
-            {transactionLoading ? "In progress" : "Buy"}
+            {isWriteContractPending || isTransactionReceiptLoading ? "In progress" : "Buy"}
           </span>
         </div>
         {account &&
-          (loading ? (
+          (isPurchasedDataLoading ? (
             <div className="loading">Loading...</div>
           ) : (
             <div className="product_purchased">
-              You bought: {purchasedData !== null ? purchasedData : 0}
+              You bought:{" "}
+              {purchasedResult !== null ? Number(purchasedResult) : 0}
             </div>
           ))}
       </div>

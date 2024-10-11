@@ -8,16 +8,19 @@ const useWalletConnection = () => {
     const { data: balanceData } = useBalance({
         address: account
       });
-  
+
     const connectMetaMask = () => {
         try {
-         connect({ connector: injected() });
+            if (typeof window.ethereum === 'undefined') {
+                alert("MetaMask is not installed. Please install it to use this feature.");
+            } 
+            connect({ connector: injected() });
         } catch (error) {
-          console.error('Error connecting wallet', error);
+            console.error('Error connecting wallet', error);
         }
       };
     
       return { account, isConnected, connectMetaMask, connectError, balanceData };
-  };
+};
   
-  export default useWalletConnection;
+export default useWalletConnection;

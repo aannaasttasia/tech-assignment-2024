@@ -1,39 +1,64 @@
 import { useEffect, useState } from "react";
 import { ProductType } from "../../types/productType";
-import Product, { transactionResultAtom } from "../Product/Product";
+import Product from "../Product/Product";
 import "./css/ProductsList.scss";
 import Loader from "../Loader/Loader";
-import { fetchProducts } from "../../services/productService";
-import { useAtomValue } from "jotai";
+import { useReadContracts } from "wagmi";
+import { contractAddress } from "../../contract";
+import contractABI from "../../contractABI.json";
 
 export function ProductsList() {
   const [products, setProducts] = useState<ProductType[]>([]);
-  const result = useAtomValue(transactionResultAtom);
+  const [transactionMessage, setTransactionMessage] = useState<string | null>(null);
+
+  const handleTransactionResult = (message: string | null) => {
+    setTransactionMessage(message);
+  };
+
+  const wagmiContract = {
+    address: contractAddress,
+    abi: contractABI.abi,
+    functionName: "productById",
+  } as const;
+
+  const { data: data } = useReadContracts({
+    contracts: [
+      { ...wagmiContract, args: [1n] },
+      { ...wagmiContract, args: [2n] },
+      { ...wagmiContract, args: [3n] },
+    ],
+  });
 
   useEffect(() => {
-    let isActual = true;
-    const getProducts = async () => {
-      const productsData = await fetchProducts();
-      if (!isActual) return;
-      setProducts(productsData);
-    };
-    getProducts();
-    return () => {
-      isActual = false;
-    };
-  }, []);
+    if (data) {
+      const productsArray = data.map((item, index) => {
+        const [name, linkToImage, priceInETH] = item.result as [
+          string,
+          string,
+          bigint
+        ];
+        return {
+          id: BigInt(index + 1),
+          name,
+          linkToImage,
+          priceInETH,
+        };
+      });
+      setProducts(productsArray);
+    }
+  }, [data]);
 
   return (
     <section className="list_products">
-      {result ? (
+      {transactionMessage ? (
         <div
           className={`message ${
-            result.message.startsWith("Transaction failed")
-              ? "message_error"
-              : "message_success"
+            transactionMessage.startsWith("Transaction successful")
+              ? "message_success"
+              : "message_error"
           }`}
         >
-          {result.message}
+          {transactionMessage}
         </div>
       ) : (
         <div className="message"></div>
@@ -43,7 +68,7 @@ export function ProductsList() {
         <ul className="list_ul-products">
           {products.map((product: ProductType) => (
             <li key={product.id}>
-              <Product product={product} />
+              <Product product={product} onTransactionResult={handleTransactionResult}/>
             </li>
           ))}
         </ul>
