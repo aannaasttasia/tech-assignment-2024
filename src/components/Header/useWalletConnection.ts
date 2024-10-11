@@ -1,59 +1,26 @@
-import { atom, useAtom } from "jotai";
-import { useEffect } from "react";
-import { walletClient } from "../../client/client";
-import { setTransactionResult } from "../Product/Product";
+import { useAccount, useBalance, useConnect } from "wagmi";
+import { injected } from 'wagmi/connectors'
 
-export const accountAtom = atom<string | null>(null);
 
 const useWalletConnection = () => {
-    const [account, setAccount] = useAtom(accountAtom);
-    const [, setResult] = useAtom(setTransactionResult)
+    const { address: account, isConnected } = useAccount();
+    const { connect, error: connectError } = useConnect({});
+    const { data: balanceData } = useBalance({
+        address: account
+      });
 
-    useEffect(() => {
-        const savedAccount = localStorage.getItem("connectedAccount");
-        if (savedAccount) {
-          setAccount(savedAccount);
+    const connectMetaMask = () => {
+        try {
+            if (typeof window.ethereum === 'undefined') {
+                alert("MetaMask is not installed. Please install it to use this feature.");
+            } 
+            connect({ connector: injected() });
+        } catch (error) {
+            console.error('Error connecting wallet', error);
         }
+      };
     
-        if (window.ethereum) {
-          window.ethereum.on("accountsChanged", handleAccountsChanged);
-        }
-    
-        return () => {
-          if (window.ethereum) {
-            window.ethereum.removeListener("accountsChanged", handleAccountsChanged);
-          }
-        };
-      }, []);
+      return { account, isConnected, connectMetaMask, connectError, balanceData };
+};
   
-    const handleAccountsChanged = (accounts: string[]) => {
-      if (accounts.length === 0) {
-        setAccount(null);
-        localStorage.removeItem("connectedAccount");
-      } else {
-        setAccount(accounts[0]);
-        localStorage.setItem("connectedAccount", accounts[0]);
-      }
-      setResult(null)
-    };
-  
-    const connectMetaMask = async () => {
-      try {
-        if (!window.ethereum) {
-          alert("MetaMask is not installed!");
-          return;
-        } else{
-            const accounts = await walletClient.request({ method: "eth_requestAccounts" });
-            const selectedAccount = accounts[0];
-            setAccount(selectedAccount);
-            localStorage.setItem("connectedAccount", selectedAccount);
-        }
-      } catch (error) {
-        console.error("Error installing wallet", error);
-      }
-    };
-  
-    return { account, connectMetaMask };
-  };
-  
-  export default useWalletConnection;
+export default useWalletConnection;

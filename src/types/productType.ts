@@ -1,5 +1,5 @@
 export interface ProductType {
-    id: number,
+    id: bigint,
     name: string;
     linkToImage: string;
     priceInETH: bigint;
